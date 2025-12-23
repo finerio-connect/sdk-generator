@@ -1,0 +1,1465 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GoRules Decision API",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/decisions/evaluate": {
+      "post": {
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Evalua una decision",
+        "description": "Procesa la evaluacion de una decision para un usuario dentro de un tenant utilizando las reglas disponibles.",
+        "operationId": "evaluate_decision_decisions_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/decisions/evaluate-bulk": {
+      "post": {
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Evalua múltiples transacciones en modo bulk",
+        "description": "Procesa la evaluación de múltiples transacciones para un usuario dentro de un tenant utilizando las reglas disponibles. Cada transacción se evalúa de forma independiente y los errores individuales no detienen el procesamiento del lote.",
+        "operationId": "evaluate_bulk_decisions_evaluate_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkEvaluationRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkEvaluationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/decisions/rules": {
+      "put": {
+        "tags": [
+          "Rules"
+        ],
+        "summary": "Crea o actualiza reglas pre/post enriquecimiento",
+        "description": "Almacena las reglas del tipo indicado para la decisión suministrada. Sobrescribe completamente el contenido previo.",
+        "operationId": "upsert_rules_decisions_rules_put",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RulesUpsertRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Rules"
+        ],
+        "summary": "Obtiene reglas pre/post enriquecimiento",
+        "description": "Recupera las reglas del tipo indicado considerando fallback de tenant y sistema si corresponde.",
+        "operationId": "get_rules_decisions_rules_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "rule_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/RuleType"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "decision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "MAIN",
+              "title": "Decision"
+            }
+          },
+          {
+            "name": "include_fallback",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Fallback"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RulesDecisionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rules"
+        ],
+        "summary": "Elimina reglas pre/post enriquecimiento",
+        "description": "Elimina las reglas del tipo indicado para la decisión especificada.",
+        "operationId": "delete_rules_decisions_rules_delete",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "rule_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/RuleType"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "decision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "MAIN",
+              "title": "Decision"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/decisions/rules/import-excel": {
+      "post": {
+        "tags": [
+          "Rules"
+        ],
+        "summary": "Importa reglas desde un archivo Excel",
+        "description": "Importa reglas desde un archivo Excel (formato .xlsx). El archivo debe tener la estructura esperada con columnas para tipo de banco, descripción de movimiento, tipo de cuenta, tipo de movimiento (income/outcome), tipo de regla, regla, categorías L0, L1 y L2.",
+        "operationId": "import_rules_from_excel_decisions_rules_import_excel_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_rules_from_excel_decisions_rules_import_excel_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExcelImportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/decisions/jdm": {
+      "put": {
+        "tags": [
+          "JDM Decisions"
+        ],
+        "summary": "Crea o actualiza decisiones JDM",
+        "description": "Guarda el contenido JDM de una decision para un tenant y usuario opcional.",
+        "operationId": "upsert_jdm_decisions_jdm_put",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JDMDecisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "JDM Decisions"
+        ],
+        "summary": "Obtiene decisiones JDM",
+        "description": "Devuelve la decision JDM y su propietario considerando fallback si aplica.",
+        "operationId": "get_jdm_decisions_jdm_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "decision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "MAIN",
+              "title": "Decision"
+            }
+          },
+          {
+            "name": "include_fallback",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Fallback"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JDMDecisionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "JDM Decisions"
+        ],
+        "summary": "Elimina decisiones JDM",
+        "description": "Elimina el contenido JDM almacenado para la decision especificada.",
+        "operationId": "delete_jdm_decisions_jdm_delete",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "decision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "MAIN",
+              "title": "Decision"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Healthcheck",
+        "description": "Health check endpoint - público, no requiere autenticación.",
+        "operationId": "healthcheck_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthcheck Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_import_rules_from_excel_decisions_rules_import_excel_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File",
+            "description": "Archivo Excel con las reglas"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id",
+            "description": "ID del tenant"
+          },
+          "rule_type": {
+            "$ref": "#/components/schemas/RuleType",
+            "description": "Tipo de regla a generar"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "description": "ID del usuario propietario (opcional)"
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision",
+            "description": "Nombre de la decisión",
+            "default": "MAIN"
+          },
+          "sheet_name": {
+            "type": "string",
+            "title": "Sheet Name",
+            "description": "Nombre de la hoja del Excel",
+            "default": "Reglas BAM"
+          },
+          "allow_duplicates": {
+            "type": "boolean",
+            "title": "Allow Duplicates",
+            "description": "Permitir reglas duplicadas",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "tenant_id",
+          "rule_type"
+        ],
+        "title": "Body_import_rules_from_excel_decisions_rules_import_excel_post"
+      },
+      "BulkEvaluationRequestDTO": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Tenant Id",
+            "description": "Identificador del tenant.",
+            "examples": [
+              "01K0WPPET0GQH42G64B3Y2FPPJ"
+            ]
+          },
+          "user_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "User Id",
+            "description": "Identificador del usuario dentro del tenant.",
+            "examples": [
+              "user-123"
+            ]
+          },
+          "transactions": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionEvaluationRequestDTO"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Transactions",
+            "description": "Lista de transacciones a evaluar."
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision",
+            "description": "Nombre del archivo de decisión a utilizar.",
+            "default": "MAIN",
+            "examples": [
+              "MAIN",
+              "CUSTOM_DECISION"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "user_id",
+          "transactions"
+        ],
+        "title": "BulkEvaluationRequestDTO",
+        "description": "DTO para request bulk - Validación API."
+      },
+      "BulkEvaluationResponseDTO": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionEvaluationResultDTO"
+            },
+            "type": "array",
+            "title": "Results",
+            "description": "Resultados de las evaluaciones de cada transacción."
+          },
+          "total_processed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Processed",
+            "description": "Total de transacciones procesadas."
+          },
+          "total_success": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Success",
+            "description": "Total de transacciones evaluadas exitosamente."
+          },
+          "total_errors": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Errors",
+            "description": "Total de transacciones con errores."
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_processed",
+          "total_success",
+          "total_errors"
+        ],
+        "title": "BulkEvaluationResponseDTO",
+        "description": "DTO para response bulk - Validación API."
+      },
+      "EvaluationRequestDTO": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Tenant Id",
+            "description": "Identificador del tenant.",
+            "examples": [
+              "01K0WPPET0GQH42G64B3Y2FPPJ"
+            ]
+          },
+          "user_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "User Id",
+            "description": "Identificador del usuario dentro del tenant.",
+            "examples": [
+              "user-123"
+            ]
+          },
+          "context": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TransactionFlowContextDTO"
+              }
+            ],
+            "title": "Context",
+            "description": "Contexto tipado a evaluar por la decisión.",
+            "discriminator": {
+              "propertyName": "flow_type",
+              "mapping": {
+                "transaction": "#/components/schemas/TransactionFlowContextDTO"
+              }
+            }
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision",
+            "description": "Nombre del archivo de decisión a utilizar.",
+            "default": "MAIN",
+            "examples": [
+              "MAIN",
+              "CUSTOM_DECISION"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "user_id",
+          "context"
+        ],
+        "title": "EvaluationRequestDTO",
+        "description": "DTO para request de evaluación - Validación API.\n\nIncluye validaciones y documentación para OpenAPI."
+      },
+      "EvaluationResponseDTO": {
+        "properties": {
+          "result": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Result",
+            "description": "Resultado de la evaluación de la decisión."
+          },
+          "performance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Performance",
+            "description": "Métricas de ejecución si están disponibles.",
+            "examples": [
+              "2.5ms"
+            ]
+          },
+          "trace": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace",
+            "description": "Información de trazabilidad para depuración."
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id",
+            "description": "ID del owner/source que proporcionó la decisión (user_id, TENANT, SYSTEM).",
+            "examples": [
+              "user-123",
+              "TENANT",
+              "SYSTEM"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "EvaluationResponseDTO",
+        "description": "DTO para response de evaluación - Validación API."
+      },
+      "ExcelImportResponse": {
+        "properties": {
+          "rules_imported": {
+            "type": "integer",
+            "title": "Rules Imported",
+            "description": "Número de reglas importadas exitosamente"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings",
+            "description": "Advertencias durante el procesamiento."
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision"
+          },
+          "rule_type": {
+            "$ref": "#/components/schemas/RuleType"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules_imported",
+          "tenant_id",
+          "owner_id",
+          "decision",
+          "rule_type"
+        ],
+        "title": "ExcelImportResponse",
+        "description": "Response al importar reglas desde Excel."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "JDMDecisionRequest": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision",
+            "default": "MAIN"
+          },
+          "content": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "content"
+        ],
+        "title": "JDMDecisionRequest",
+        "description": "Request para crear/actualizar una decisión JDM."
+      },
+      "JDMDecisionResponse": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "title": "Decision"
+          },
+          "owner": {
+            "type": "string",
+            "title": "Owner"
+          },
+          "content": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "owner",
+          "content"
+        ],
+        "title": "JDMDecisionResponse",
+        "description": "Response con el contenido JDM y su propietario."
+      },
+      "MatchCondition": {
+        "properties": {
+          "equals": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equals"
+          },
+          "contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contains"
+          },
+          "regex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regex"
+          }
+        },
+        "type": "object",
+        "title": "MatchCondition",
+        "description": "Condición de matching para reglas (equals, contains o regex).\n\nLa validación de que al menos un operador esté presente se hace\nen el dominio (FieldCondition), no aquí."
+      },
+      "RuleOutputsPayload": {
+        "properties": {
+          "category_l0_literal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L0 Literal"
+          },
+          "category_l0_expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L0 Expression"
+          },
+          "category_l1_literal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L1 Literal"
+          },
+          "category_l1_expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L1 Expression"
+          },
+          "category_l2_literal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L2 Literal"
+          },
+          "category_l2_expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category L2 Expression"
+          }
+        },
+        "type": "object",
+        "title": "RuleOutputsPayload",
+        "description": "Outputs de una regla (categorías L0, L1, L2)."
+      },
+      "RulePayload": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "conditions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MatchCondition"
+            },
+            "type": "object",
+            "title": "Conditions"
+          },
+          "outputs": {
+            "$ref": "#/components/schemas/RuleOutputsPayload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conditions",
+          "outputs"
+        ],
+        "title": "RulePayload",
+        "description": "Definición de una regla en formato API.\n\nNota: La validación de campos requeridos y permitidos se hace\nen el dominio (RuleValidator), no aquí. Este schema solo valida\nel formato del payload HTTP."
+      },
+      "RuleType": {
+        "type": "string",
+        "enum": [
+          "pre_enrich",
+          "post_enrich"
+        ],
+        "title": "RuleType"
+      },
+      "RulesDecisionResponse": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "title": "Decision"
+          },
+          "rule_type": {
+            "$ref": "#/components/schemas/RuleType"
+          },
+          "owner": {
+            "type": "string",
+            "title": "Owner"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RulePayload"
+            },
+            "type": "array",
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "rule_type",
+          "owner",
+          "rules"
+        ],
+        "title": "RulesDecisionResponse",
+        "description": "Response con las reglas y su propietario."
+      },
+      "RulesUpsertRequest": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "decision": {
+            "type": "string",
+            "title": "Decision",
+            "default": "MAIN"
+          },
+          "rule_type": {
+            "$ref": "#/components/schemas/RuleType"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RulePayload"
+            },
+            "type": "array",
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "rule_type",
+          "rules"
+        ],
+        "title": "RulesUpsertRequest",
+        "description": "Request para crear/actualizar reglas.\n\nNota: La validación de que haya al menos una regla es una validación\nde formato HTTP, no de negocio, por eso se mantiene aquí."
+      },
+      "TransactionDataDTO": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Transaction Id",
+            "description": "Identificador único de la transacción.",
+            "examples": [
+              "tx-001",
+              "transaction-12345"
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Monto de la transacción.",
+            "examples": [
+              1500.0,
+              250.5
+            ]
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "Código de moneda (ISO 4217).",
+            "examples": [
+              "MXN",
+              "USD",
+              "EUR"
+            ]
+          },
+          "movement_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Movement Type",
+            "description": "Tipo de movimiento.",
+            "examples": [
+              "income",
+              "outcome"
+            ]
+          },
+          "account_holder_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Holder Type",
+            "description": "Tipo de titular de cuenta.",
+            "examples": [
+              "consumer",
+              "business"
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category",
+            "description": "Categoría de la transacción.",
+            "examples": [
+              "Electronics",
+              "Food",
+              "Transport"
+            ]
+          },
+          "merchant_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Name",
+            "description": "Nombre del comercio.",
+            "examples": [
+              "Amazon",
+              "Starbucks",
+              "Walmart"
+            ]
+          },
+          "merchant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Id",
+            "description": "ID del comercio."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Descripción de la transacción.",
+            "examples": [
+              "Compra en línea",
+              "Pago de servicio"
+            ]
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference",
+            "description": "Referencia de la transacción."
+          },
+          "transaction_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Date",
+            "description": "Fecha de la transacción (ISO 8601).",
+            "examples": [
+              "2025-11-20T10:30:00Z"
+            ]
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "transaction_id"
+        ],
+        "title": "TransactionDataDTO",
+        "description": "DTO para datos de transacción con validaciones API.\n\nSimilar a TransactionData del dominio, pero con validaciones\ny documentación específicas de API."
+      },
+      "TransactionEvaluationRequestDTO": {
+        "properties": {
+          "context": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TransactionFlowContextDTO"
+              }
+            ],
+            "title": "Context",
+            "description": "Contexto tipado de la transacción a evaluar (incluye transaction_id).",
+            "discriminator": {
+              "propertyName": "flow_type",
+              "mapping": {
+                "transaction": "#/components/schemas/TransactionFlowContextDTO"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "context"
+        ],
+        "title": "TransactionEvaluationRequestDTO",
+        "description": "DTO para transacción individual en bulk - Validación API.\n\nEl contexto contiene todos los datos de la transacción,\nincluyendo el transaction_id dentro de TransactionData."
+      },
+      "TransactionEvaluationResultDTO": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id",
+            "description": "Identificador de la transacción."
+          },
+          "result": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Result",
+            "description": "Resultado de la evaluación."
+          },
+          "performance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Performance",
+            "description": "Métricas de ejecución si están disponibles."
+          },
+          "trace": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace",
+            "description": "Información de trazabilidad para depuración."
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id",
+            "description": "ID del owner/source que proporcionó la decisión (user_id, TENANT, SYSTEM)."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Mensaje de error si la evaluación falló."
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id"
+        ],
+        "title": "TransactionEvaluationResultDTO",
+        "description": "DTO para resultado de transacción individual - Validación API."
+      },
+      "TransactionFlowContextDTO": {
+        "properties": {
+          "flow_type": {
+            "type": "string",
+            "const": "transaction",
+            "title": "Flow Type",
+            "description": "Tipo de flujo para transacciones.",
+            "default": "transaction"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TransactionDataDTO",
+            "description": "Datos tipados del contexto de la transacción."
+          }
+        },
+        "type": "object",
+        "title": "TransactionFlowContextDTO",
+        "description": "DTO para contexto de transacciones - Validación API."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Evaluation",
+      "description": "Operaciones para evaluar decisiones usando reglas disponibles."
+    },
+    {
+      "name": "Rules",
+      "description": "Gestión de reglas pre y post enriquecimiento."
+    },
+    {
+      "name": "JDM Decisions",
+      "description": "Administración del contenido JDM asociado a decisiones."
+    }
+  ]
+}

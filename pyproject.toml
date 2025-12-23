@@ -1,0 +1,21 @@
+[project]
+name = "sdk-generator"
+version = "0.1.0"
+description = "SDK generator for Cortex services"
+requires-python = ">=3.11"
+
+dependencies = [
+  "jinja2",
+  "pydantic",
+  "pyyaml",
+  "httpx",
+]
+
+[tool.uv]
+dev-dependencies = [
+  "ruff",
+  "pytest",
+]
+
+[tool.ruff]
+line-length = 100
