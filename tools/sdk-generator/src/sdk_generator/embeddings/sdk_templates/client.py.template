@@ -1,0 +1,73 @@
+"""Cliente HTTP para {package_title} API."""
+
+from __future__ import annotations
+
+import httpx
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Los tipos de modelos se importan dinámicamente en cada método
+    pass
+
+
+class {client_class}:
+    """Cliente para interactuar con {package_title} API.
+    
+    Este cliente usa httpx y modelos Pydantic v2 para validación automática.
+    
+    Args:
+        base_url: URL base del API
+        timeout: Timeout en segundos para las requests
+        auth: Objeto de autenticación httpx (opcional)
+        headers: Headers adicionales para todas las requests
+    
+    Examples:
+        >>> from {package_name} import create_client
+        >>> client = create_client("https://api.example.com")
+        >>> # Use los métodos generados automáticamente
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        timeout: float = 30.0,
+        auth: httpx.Auth | None = None,
+        headers: dict[str, str] | None = None,
+        verify_ssl: bool = True,
+        follow_redirects: bool = True,
+        **httpx_kwargs: Any,
+    ):
+        """Inicializa el cliente."""
+        self.base_url = base_url.rstrip("/")
+        
+        default_headers = {{
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }}
+        if headers:
+            default_headers.update(headers)
+
+        self._client = httpx.Client(
+            base_url=self.base_url,
+            timeout=timeout,
+            auth=auth,
+            headers=default_headers,
+            verify=verify_ssl,
+            follow_redirects=follow_redirects,
+            **httpx_kwargs,
+        )
+
+    def __enter__(self) -> "{client_class}":
+        """Context manager entry."""
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        """Context manager exit."""
+        self.close()
+
+    def close(self) -> None:
+        """Cierra el cliente HTTP."""
+        self._client.close()
+
+    # Métodos específicos del API se pueden agregar aquí
+    # o extender este cliente según necesidades

@@ -1,0 +1,35 @@
+"""A client library for accessing GoRules Decision API
+
+This SDK supports multiple authentication methods:
+
+1. No authentication (for local development)
+2. AWS IAM authentication (for Lambda Function URLs with AWS_IAM auth type)
+3. Bearer token authentication (traditional API tokens)
+
+For AWS environments (Lambda, EC2, ECS, etc.), the SDK can automatically use
+IAM credentials to authenticate requests to Lambda Function URLs.
+"""
+
+from .client import AuthenticatedClient, Client
+from .config import create_authenticated_client, create_client, get_base_url
+
+try:
+    from .config import AWSSigV4Auth
+    __all__ = (
+        "AuthenticatedClient",
+        "Client",
+        "create_client",
+        "create_authenticated_client",
+        "get_base_url",
+        "AWSSigV4Auth",
+    )
+except ImportError:
+    # boto3 not available, AWS auth not supported
+    __all__ = (
+        "AuthenticatedClient",
+        "Client",
+        "create_client",
+        "create_authenticated_client",
+        "get_base_url",
+    )
+

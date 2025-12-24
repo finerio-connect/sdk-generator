@@ -1,6 +1,6 @@
 [project]
-name = "sdk_rules"
-version = "1"
+name = "cortex_embeddings_sdk"
+version = "1.0.0"
 description = "SDK Cliente para Cortex Rules con Pydantic v2"
 requires-python = ">=3.12"
 dependencies = [

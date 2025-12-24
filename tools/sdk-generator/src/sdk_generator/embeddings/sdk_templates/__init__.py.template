@@ -1,0 +1,17 @@
+"""SDK Cliente para {package_title} con modelos Pydantic v2.
+
+Este SDK utiliza Pydantic v2 para validación automática de datos.
+"""
+
+from .client import {client_class}
+from .config import create_client, get_base_url
+
+# Importar todos los modelos para fácil acceso
+try:
+    from .models import *  # noqa: F403
+except ImportError:
+    # Si no se generaron los modelos todavía
+    pass
+
+__version__ = "{version}"
+__all__ = ["{client_class}", "create_client", "get_base_url"]
