@@ -1,0 +1,376 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Cortex Embeddings API",
+    "description": "Servicio FastAPI para generar embeddings con fastembed y arquitectura hexagonal.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/embeddings": {
+      "post": {
+        "tags": [
+          "embeddings"
+        ],
+        "summary": "Create Embeddings",
+        "operationId": "create_embeddings_v1_embeddings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmbeddingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/embeddings/bulk": {
+      "post": {
+        "tags": [
+          "embeddings"
+        ],
+        "summary": "Create Bulk Embeddings",
+        "description": "Genera embeddings en bulk para múltiples items con ID y descripción.\n\nGarantiza que el orden de los embeddings corresponde al orden de los items\nde entrada, permitiendo una asociación explícita mediante IDs.",
+        "operationId": "create_bulk_embeddings_v1_embeddings_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkEmbeddingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkEmbeddingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BulkEmbeddingItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identificador único del item."
+          },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Embedding",
+            "description": "Vector de embedding generado."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "embedding"
+        ],
+        "title": "BulkEmbeddingItem"
+      },
+      "BulkEmbeddingRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BulkItem"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Items",
+            "description": "Lista de items con ID y descripción para generar embeddings."
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model",
+            "description": "Nombre del modelo solicitado. Si se omite se utilizará el modelo por defecto: snowflake/snowflake-arctic-embed-xs."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "BulkEmbeddingRequest"
+      },
+      "BulkEmbeddingResponse": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Nombre del modelo utilizado."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Count",
+            "description": "Número de embeddings generados."
+          },
+          "dimensions": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dimensions",
+            "description": "Dimensión de los embeddings."
+          },
+          "embeddings": {
+            "items": {
+              "$ref": "#/components/schemas/BulkEmbeddingItem"
+            },
+            "type": "array",
+            "title": "Embeddings",
+            "description": "Lista de embeddings con sus IDs correspondientes."
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "count",
+          "embeddings"
+        ],
+        "title": "BulkEmbeddingResponse"
+      },
+      "BulkItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identificador único del item."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Texto a convertir en embedding."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "description"
+        ],
+        "title": "BulkItem"
+      },
+      "EmbeddingRequest": {
+        "properties": {
+          "inputs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Inputs",
+            "description": "Textos a convertir en embeddings."
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model",
+            "description": "Nombre del modelo solicitado. Si se omite se utilizará el modelo por defecto: snowflake/snowflake-arctic-embed-xs."
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "title": "EmbeddingRequest"
+      },
+      "EmbeddingResponse": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Nombre del modelo utilizado."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Count",
+            "description": "Número de embeddings generados."
+          },
+          "dimensions": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dimensions",
+            "description": "Dimensión de los embeddings."
+          },
+          "embeddings": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Embeddings",
+            "description": "Lista de embeddings en orden de entrada."
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "count",
+          "embeddings"
+        ],
+        "title": "EmbeddingResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Estado de salud de la API."
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Modelo configurado para generar embeddings."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "model"
+        ],
+        "title": "HealthResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
