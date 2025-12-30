@@ -477,18 +477,18 @@ class OpenApiGeneratorImpl(OpenApiGeneratorPort, OpenApiGeneratorUtilsPort):
                 args_doc_str = "\n            ".join(args_doc)
 
                 method_code = f'''
-        def {method_name}(
+    def {method_name}(
             {params_str},
-        ) -> {return_type}:
-            """{description if description else summary}
+    ) -> {return_type}:
+        """{description if description else summary}
 
-            Args:
-                {args_doc_str}
+        Args:
+            {args_doc_str}
 
-            Returns:
-                {"Modelo " + response_type + " con la respuesta tipada" if response_type else "Respuesta del API"}
-            """
-            {method_body}
+        Returns:
+            {"Modelo " + response_type + " con la respuesta tipada" if response_type else "Respuesta del API"}
+        """
+        {method_body}
     '''
                 methods.append(method_code)
 
