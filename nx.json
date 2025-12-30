@@ -1,0 +1,12 @@
+{
+    "extends": "nx/presets/npm.json",
+    "affected": {
+      "defaultBase": "main"
+    },
+    "tasksRunnerOptions": {
+      "default": {
+        "runner": "nx/tasks-runners/default"
+      }
+    }
+  }
+  
