@@ -8,10 +8,15 @@ authors = [
 ]
 requires-python = ">=3.9,<4"
 dependencies = [
-    "datamodel-code-generator[http]<0.46.0",
     "rich>=14.2.0",
     "typer>=0.20.1",
     "httpx>=0.27.0",
+
+    # Python 3.9 → versión vieja
+    "datamodel-code-generator[http]<0.46.0; python_version < '3.10'",
+
+    # Python 3.10+ → versión moderna
+    "datamodel-code-generator[http]>=0.46.0; python_version >= '3.10'",
 ]
 
 [tool.uv.sources]
