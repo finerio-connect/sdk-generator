@@ -70,8 +70,6 @@ class OpenApiGeneratorImpl(OpenApiGeneratorPort, OpenApiGeneratorUtilsPort):
                 "openapi",
                 "--output-model-type",
                 "pydantic_v2.BaseModel",
-                "--http-client",
-                "httpx",  # Genera cliente con httpx
                 "--field-constraints",
                 "--use-standard-collections",
                 "--use-union-operator",
